@@ -5,4 +5,4 @@
 
 # PS:
 # /pi is mostly just for quick checking since I needed a 32-bit target with heavier debugging facilities
-# Had to remove all history and create a fresh repo due to way too many pak files that had been thrown aroundin in various folders. -Sorry
+# Had to remove all history and create a fresh repo due to way too many pak files that had been thrown around in various folders. -Sorry
