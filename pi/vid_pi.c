@@ -62,42 +62,42 @@ unsigned short d_8to16table[256];
 // unsigned d_8to24table[256];
 
 void VID_Update(vrect_t *rects) {
-	for (int i = 0; i < (BASEWIDTH * BASEHEIGHT); i++)
-		fbp[i] = d_8to16table[ vid_buffer[i] ];
+    for (int i = 0; i < (BASEWIDTH * BASEHEIGHT); i++)
+        fbp[i] = d_8to16table[ vid_buffer[i] ];
 }
 
 void VID_SetPalette(unsigned char *palette) {
     for (uint32_t i = 0; i < 256; i++) {
-    	uint8_t r = (*palette++ >>  3) & 31;
-    	uint8_t g = (*palette++ >>  2) & 63;
-    	uint8_t b = (*palette++ >>  3) & 31;
-    	d_8to16table[i] = (r << 11) | (g << 5) | b;
+        uint8_t r = (*palette++ >>  3) & 31;
+        uint8_t g = (*palette++ >>  2) & 63;
+        uint8_t b = (*palette++ >>  3) & 31;
+        d_8to16table[i] = (r << 11) | (g << 5) | b;
     }
 }
 
 void VID_ShiftPalette(unsigned char *palette) {
-	VID_SetPalette(palette);
+    VID_SetPalette(palette);
 }
 
 void VID_Init(unsigned char *palette) {
     struct fb_var_screeninfo vinfo, finfo;
 
-	vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
-	vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
-	vid.aspect = 1.0;
-	vid.numpages = 1;
-	vid.colormap = host_colormap;
-	vid.fullbright = 256 - LittleLong(*((int *)vid.colormap + 2048));
-	vid.buffer = vid.conbuffer = vid_buffer;
-	vid.rowbytes = vid.conrowbytes = BASEWIDTH;
+    vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
+    vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
+    vid.aspect = 1.0;
+    vid.numpages = 1;
+    vid.colormap = host_colormap;
+    vid.fullbright = 256 - LittleLong(*((int *)vid.colormap + 2048));
+    vid.buffer = vid.conbuffer = vid_buffer;
+    vid.rowbytes = vid.conrowbytes = BASEWIDTH;
 
-	d_pzbuffer = zbuffer;
+    d_pzbuffer = zbuffer;
 
 #ifndef NOSURFCACHE
-	D_InitCaches(surfcache, sizeof(surfcache));
+    D_InitCaches(surfcache, sizeof(surfcache));
 #endif
 
-	VID_SetPalette(palette);
+    VID_SetPalette(palette);
 
     fbfd = open("/dev/fb1", O_RDWR);
     if (fbfd == -1) {
