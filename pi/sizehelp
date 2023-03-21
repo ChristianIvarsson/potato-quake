@@ -1,0 +1,114 @@
+#!/bin/sh
+
+echo
+
+findsec ()
+{
+	SECTMP=$(arm-linux-gnueabihf-size -A -d $1 | grep $2)
+	SECSIZE=$(echo $SECTMP | head -n1 | cut -d " " -f2)
+	case $SECSIZE in
+		''|*[!0-9]*) SECSIZE=0
+	esac
+}
+
+findsec_mk2 ()
+{
+	SECTMP=$(echo "{$1}" | grep $2) 
+	SECSIZE=$(echo $SECTMP | head -n1 | cut -d " " -f2)
+	case $SECSIZE in
+		''|*[!0-9]*) SECSIZE=0
+	esac
+}
+
+printsec ()
+{
+	OBJDAT=$(arm-linux-gnueabihf-size -A -d $1)
+
+	findsec_mk2 "{$OBJDAT}" "-w .iram"
+	IRAMSEC=$SECSIZE
+	findsec_mk2 "{$OBJDAT}" "-w .extram"
+	ERAMSEC=$SECSIZE
+	findsec_mk2 "{$OBJDAT}" "-w .bss"
+	BSSSEC=$SECSIZE
+	findsec_mk2 "{$OBJDAT}" "-E (^|\s).data($|\s)"
+	DATASEC=$SECSIZE
+	findsec_mk2 "{$OBJDAT}" "-E (^|\s).rodata($|\s)"
+	RODATA=$SECSIZE
+
+	# Strip ./out/ and .o from the name
+	FNAM=$(echo $(echo "$1" | sed "s/.\/out\///") | sed 's/\.o//')
+
+	if [ "$BSSSEC" -gt "63" ] || [ "$IRAMSEC" -gt "0" ] || [ "$ERAMSEC" -gt "0" ] || [ "$DATASEC" -gt "63" ] || [ "$RODATA" -gt "511" ]; then
+		printf "%-15s (bss: %7d  iram: %6d  eram: %6d  data: %6d  rodata: %6d)\n" $FNAM $BSSSEC $IRAMSEC $ERAMSEC $DATASEC $RODATA
+	fi
+}
+
+
+#####################################################################
+# Individual objects
+
+printf "\nMain files\n"
+# for f in $(find ./out/ -iname "*.o")
+for f in ./out/*.o ; do
+	printsec $f
+done
+
+printf "\nRender files\n"
+# for f in $(find ./out/rend -iname "*.o")
+for f in ./out/rend/*.o ; do
+	printsec $f
+done
+
+#####################################################################
+# The whole app
+
+# vid_pi.c tot    : 886348 / 230988 .bss + 4 .data
+# Surface cache   : ? ? 655360
+# Z buffer        : 153600 (320 * 240 * 2 bytes)
+# Video buffer    :  76800 (320 * 240 * 1 bytes)
+# Palette crap    :    512
+# Random bss data :     76
+# Random data     :      4
+
+printf "\nApplication\n"
+
+DATASEC="0"
+BSSSEC="230988"
+ERAMSEC="0"
+IRAMSEC="0"
+
+printsec "quake"
+
+# All of it
+TOTRAM=$(($BSSSEC + $DATASEC + $ERAMSEC + $IRAMSEC))
+# Data targeted at DRAM
+TOTINT=$(($BSSSEC + $DATASEC))
+# Data targeted at special ram
+TOTEXT=$(($ERAMSEC + $IRAMSEC))
+
+printf "\ntot appl: %3d k (%d k without video buffers)\ninternal: %3d k (%d k without video buffers)\nexternal: %3d k\n\n" $(($TOTRAM / 1024)) $((($TOTRAM - 230400) / 1024)) $(($TOTINT / 1024)) $((($TOTINT - 230400) / 1024)) $(($TOTEXT / 1024))
+
+
+OLDBSS="0"
+if test -f "out/oldbsssize"; then
+	OLDBSS=$(cat out/oldbsssize)
+fi
+
+if [ "1" -gt "$OLDBSS" ]; then echo "Old bss size not available"
+elif [ "$OLDBSS" -gt "$BSSSEC" ]; then  echo "BSS size decreased by:" $(expr $OLDBSS - $BSSSEC) "bytes"
+elif [ "$BSSSEC" -gt "$OLDBSS" ]; then echo "BSS size increased by:" $(expr $BSSSEC - $OLDBSS) "bytes"	
+else echo "BSS size same as before"
+fi
+echo $BSSSEC > out/oldbsssize
+
+OLDDATA="0"
+if test -f "out/olddatasize"; then
+	OLDDATA=$(cat out/olddatasize)
+fi
+
+if [ "1" -gt "$OLDDATA" ]; then echo "Old data size not available"
+elif [ "$OLDDATA" -gt "$DATASEC" ]; then echo "Data size decreased by:" $(expr $OLDDATA - $DATASEC) "bytes"
+elif [ "$DATASEC" -gt "$OLDDATA" ]; then echo "Data size increased by:" $(expr $DATASEC - $OLDDATA) "bytes"	
+else echo "Data size same as before"
+fi
+echo $DATASEC > out/olddatasize

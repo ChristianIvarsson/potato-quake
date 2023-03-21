@@ -1,0 +1,95 @@
+idf_component_register(
+            SRCS
+            "../../core/render/original/d_surf.c"
+            "../../core/render/original/d_edge.c"
+            "../../core/render/original/d_fill.c"
+            "../../core/render/original/d_init.c"
+            "../../core/render/original/d_modech.c"
+            "../../core/render/original/d_part.c"
+            "../../core/render/original/d_polyse.c"
+            "../../core/render/original/d_scan.c"
+            "../../core/render/original/d_sky.c"
+            "../../core/render/original/d_sprite.c"
+            "../../core/render/original/d_vars.c"
+            "../../core/render/original/model.c"
+            "../../core/render/original/r_aclip.c"
+            "../../core/render/original/r_alias.c"
+            "../../core/render/original/r_bsp.c"
+            "../../core/render/original/r_draw.c"
+            "../../core/render/original/r_edge.c"
+            "../../core/render/original/r_efrag.c"
+            "../../core/render/original/r_light.c"
+            "../../core/render/original/r_main.c"
+            "../../core/render/original/r_misc.c"
+            "../../core/render/original/r_part.c"
+            "../../core/render/original/r_sky.c"
+            "../../core/render/original/r_sprite.c"
+            "../../core/render/original/r_surf.c"
+            "../../core/render/original/r_vars.c"
+            "../../core/chase.c"
+            "../../core/cl_demo.c"
+            "../../core/cl_input.c"
+            "../../core/cl_main.c"
+            "../../core/cl_parse.c"
+            "../../core/cl_tent.c"
+            "../../core/cmd.c"
+            "../../core/common.c"
+            "../../core/console.c"
+            "../../core/crc.c"
+            "../../core/cvar.c"
+            "../../core/draw.c"
+            "../../core/host.c"
+            "../../core/host_cmd.c"
+            "../../core/keys.c"
+            "../../core/mathlib.c"
+            "../../core/menu.c"
+            "../../core/net_loop.c"
+            "../../core/net_main.c"
+            "../../core/net_vcr.c"
+            "../../core/pr_cmds.c"
+            "../../core/pr_edict.c"
+            "../../core/pr_exec.c"
+            "../../core/sbar.c"
+            "../../core/screen.c"
+            "../../core/sv_main.c"
+            "../../core/sv_move.c"
+            "../../core/sv_phys.c"
+            "../../core/sv_user.c"
+            "../../core/view.c"
+            "../../core/wad.c"
+            "../../core/world.c"
+            "../../core/zone.c"
+            "main.c"
+            "sys_esp32.c"
+            "vid_esp32.c"
+            "display.c"
+            "in_null.c"
+            "snd_null.c"
+            "cd_null.c"
+            "net_none.c"
+            INCLUDE_DIRS "."
+)
+
+
+#     -DTRACE_STACK
+
+target_compile_options(
+    ${COMPONENT_LIB}
+    PRIVATE
+    -Wno-error
+    -Wno-missing-field-initializers
+    -Wno-error=format-overflow
+    -Wno-error=array-parameter
+    -Wno-error=stringop-truncation
+    -Wno-extra
+    -DESP32
+    -DNOWARP
+    -DNOSURFCACHE
+    -trigraphs
+    -Wno-trigraphs
+    -Wno-pointer-sign
+    -Wno-implicit-function-declaration
+)
+
+
+

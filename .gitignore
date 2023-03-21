@@ -1,0 +1,15 @@
+
+host/out/*
+host/id1/*
+host/quake.map
+
+pi/out/*
+pi/id1/*
+pi/quake
+pi/quake.map
+
+esp/build/*
+esp/junk/*
+
+.vscode/*
+.private/*
