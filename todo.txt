@@ -1,0 +1,33 @@
+
+Current stack usage: ~89k
+Max usable resolution 320 x 100
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////  Before anything else  //////////////////////////////////////////
+
+1.1:
+There's just no way to free up enough space so one should perhaps experiment with rendering in chunks?
+That way there would also be enough room for double-buffering.
+How do you even do that with 3d?
+
+1.2:
+Eliminate stack hogs. -Sane goal would be 64k?
+Text print functions in particular are extremely wasteful since they allocate quite large frames and love recursion to the n'th degree...
+- Simply force a crash in the stack tracer once a limit is reached and backtrace with gdb -
+
+1.3:
+Compact bools that are not directly in the rendering pipeline. (Make them flags in a bitfield)
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////  Future ideas  //////////////////////////////////////////////
+
+2:
+Implement audio output
+Compress audio samples while loading them.
+
+3:
+Implement input
+
+4:
+Wireless network play?
+
